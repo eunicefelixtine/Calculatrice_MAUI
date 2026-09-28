@@ -53,3 +53,5 @@ APK signé généré : `bin/Debug/net10.0-android/com.epi.calculatrice-Signed.ap
 - `Calculatrice.cs` — moteur de calcul (expression)
 - `MainPage.xaml` + `MainPage.xaml.cs` — interface (7 layouts)
 - `MauiProgram.cs`, `App.xaml`, `AppShell.xaml` — amorçage de l'application
+
+Projet réalisé par NZEUTEM DOMMOE Eunice Felixtine - 22GOO347
