@@ -1,0 +1,26 @@
+## .NET / MAUI
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+
+## Visual Studio / VS Code
+.vs/
+.idea/
+*.swp
+.DS_Store
+
+## Android / packaging
+*.apk
+*.aab
+*.keystore
+*.jks
+
+## Divers
+Thumbs.db
