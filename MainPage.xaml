@@ -7,275 +7,154 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-
-            <Style x:Key="ToucheChiffre" TargetType="Button">
+            <!-- Style de base utilisé par tous les boutons de la calculatrice -->
+            <Style x:Key="BaseButtonStyle" TargetType="Button">
                 <Setter Property="BackgroundColor" Value="#2C2C2E" />
                 <Setter Property="TextColor" Value="#FFFFFF" />
                 <Setter Property="FontSize" Value="24" />
                 <Setter Property="FontAttributes" Value="Bold" />
                 <Setter Property="CornerRadius" Value="10" />
-                <Setter Property="Padding" Value="0" />
-                <Setter Property="Margin" Value="3" />
-                <Setter Property="HeightRequest" Value="62" />
+                <Setter Property="Margin" Value="2" />
+                <Setter Property="HeightRequest" Value="60" />
             </Style>
 
-            <Style x:Key="ToucheOperateur" TargetType="Button" BasedOn="{StaticResource ToucheChiffre}">
+            <!-- Style par défaut appliqué à tous les boutons -->
+            <Style TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}" />
+
+            <!-- Boutons d'opération -->
+            <Style x:Key="Op" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
                 <Setter Property="BackgroundColor" Value="#FF9F0A" />
                 <Setter Property="TextColor" Value="#1C1C1E" />
             </Style>
 
-            <Style x:Key="ToucheEgalite" TargetType="Button" BasedOn="{StaticResource ToucheOperateur}">
+            <!-- Bouton égal -->
+            <Style x:Key="Egal" TargetType="Button" BasedOn="{StaticResource Op}">
                 <Setter Property="BackgroundColor" Value="#0A84FF" />
                 <Setter Property="TextColor" Value="#FFFFFF" />
             </Style>
 
-            <Style x:Key="ToucheEfficace" TargetType="Button" BasedOn="{StaticResource ToucheChiffre}">
+            <!-- Boutons d'actions secondaires -->
+            <Style x:Key="Action" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
                 <Setter Property="BackgroundColor" Value="#48484A" />
             </Style>
 
-            <Style x:Key="ToucheMemoire" TargetType="Button" BasedOn="{StaticResource ToucheChiffre}">
+            <!-- Boutons compacts comme MC, MR, etc. -->
+            <Style x:Key="Chip" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
                 <Setter Property="BackgroundColor" Value="#3A3A3C" />
-                <Setter Property="FontSize" Value="16" />
-                <Setter Property="HeightRequest" Value="42" />
-            </Style>
-
-            <Style x:Key="ToucheChip" TargetType="Button" BasedOn="{StaticResource ToucheMemoire}">
                 <Setter Property="FontSize" Value="14" />
                 <Setter Property="HeightRequest" Value="38" />
                 <Setter Property="CornerRadius" Value="19" />
             </Style>
 
-            <Style x:Key="ToucheScience" TargetType="Button" BasedOn="{StaticResource ToucheChiffre}">
+            <!-- Boutons scientifiques -->
+            <Style x:Key="Sci" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
                 <Setter Property="BackgroundColor" Value="#262628" />
                 <Setter Property="FontSize" Value="15" />
-                <Setter Property="HeightRequest" Value="46" />
+                <Setter Property="HeightRequest" Value="44" />
                 <Setter Property="CornerRadius" Value="8" />
-                <Setter Property="Padding" Value="0" />
             </Style>
-
-            <Style x:Key="ToucheSeconde" TargetType="Button" BasedOn="{StaticResource ToucheScience}">
-                <Setter Property="BackgroundColor" Value="#4B6584" />
-                <Setter Property="TextColor" Value="#FFFFFF" />
-            </Style>
-
         </ResourceDictionary>
     </ContentPage.Resources>
 
+    <!-- Conteneur principal de l'interface utilisateur de la calculatrice -->
     <AbsoluteLayout>
-
-        <!-- Panneau principal (Grid) -->
-        <Grid x:Name="Panneau"
-              AbsoluteLayout.LayoutBounds="0,0,1,1"
+        <!-- Panneau principal contenant l'écran et les boutons -->
+        <Grid x:Name="Panneau" 
+              AbsoluteLayout.LayoutBounds="0,0,1,1" 
               AbsoluteLayout.LayoutFlags="All"
-              Padding="10,6"
-              RowSpacing="6"
-              ColumnSpacing="6">
+              Padding="8" 
+              RowSpacing="4" 
+              ColumnSpacing="4" 
+              RowDefinitions="Auto,Auto,Auto,Auto,*">
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" /> 
-                <RowDefinition Height="Auto" /> 
-                <RowDefinition Height="Auto" /> 
-                <RowDefinition Height="Auto" /> 
-                <RowDefinition Height="*" />    
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+            <!-- Barre d'outils supérieure : angle, historique, copier -->
+            <HorizontalStackLayout Grid.Row="0" Spacing="6" HorizontalOptions="Center">
+                <Button x:Name="BtnAngle" Text="Deg" Style="{StaticResource Chip}" Clicked="OnBasculeAngle" />
+                <Button Text="Ans" Style="{StaticResource Chip}" Clicked="OnTouche" />
+                <Button x:Name="BtnHisto" Text="Hist" Style="{StaticResource Chip}" Clicked="OnBasculeHistorique" />
+                <Button Text="Copier" Style="{StaticResource Chip}" Clicked="OnCopier" />
+            </HorizontalStackLayout>
 
-            <Grid.Children>
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+            <!-- Écran d'affichage : expression en cours + résultat -->
+            <Border Grid.Row="1" BackgroundColor="#2C2C2E" Stroke="#3A3A3C" StrokeShape="RoundRectangle 12" Padding="12,6">
+                <VerticalStackLayout Spacing="2">
+                    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                        <Label x:Name="LblExpression" Text="0" FontSize="15" TextColor="#8E8E93" HorizontalOptions="End" />
+                    </ScrollView>
+                    <Label x:Name="LblResultat" Text="0" FontSize="44" FontAttributes="Bold" TextColor="#FFFFFF" HorizontalTextAlignment="End" LineBreakMode="HeadTruncation" />
+                </VerticalStackLayout>
+            </Border>
 
-                    <!-- Rangée de puces (HorizontalStackLayout) -->
-                    <HorizontalStackLayout Grid.ColumnSpan="6" Spacing="6">
-                        <Button x:Name="BtnAngle" Text="Deg" Style="{StaticResource ToucheChip}" Clicked="OnBasculeAngle" />
-                        <Button Text="Ans" Style="{StaticResource ToucheChip}" Clicked="OnTouche" />
-                        <Button x:Name="BtnHisto" Text="Hist" Style="{StaticResource ToucheChip}" Clicked="OnBasculeHistorique" />
-                        <Button Text="Copier" Style="{StaticResource ToucheChip}" Clicked="OnCopier" />
-                    </HorizontalStackLayout>
-                </Grid>
+            <!-- Mémoire de la calculatrice -->
+            <HorizontalStackLayout Grid.Row="2" Spacing="4" HorizontalOptions="Fill">
+                <Label x:Name="LblMemoire" Text="M" TextColor="#FF9F0A" FontAttributes="Bold" IsVisible="False" VerticalOptions="Center" WidthRequest="16" />
+                <Button Text="MC" Style="{StaticResource Chip}" Clicked="OnTouche" HorizontalOptions="FillAndExpand" />
+                <Button Text="MR" Style="{StaticResource Chip}" Clicked="OnTouche" HorizontalOptions="FillAndExpand" />
+                <Button Text="M+" Style="{StaticResource Chip}" Clicked="OnTouche" HorizontalOptions="FillAndExpand" />
+                <Button Text="M−" Style="{StaticResource Chip}" Clicked="OnTouche" HorizontalOptions="FillAndExpand" />
+                <Button Text="MS" Style="{StaticResource Chip}" Clicked="OnTouche" HorizontalOptions="FillAndExpand" />
+            </HorizontalStackLayout>
 
-                <!-- Zone d'affichage : opération au-dessus du résultat (Border) -->
-                <Border Grid.Row="1"
-                        BackgroundColor="#2C2C2E"
-                        Stroke="#3A3A3C"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 14"
-                        Padding="14,8"
-                        Margin="2,0,2,2">
+            <!-- Boutons de fonctions scientifiques -->
+            <FlexLayout x:Name="PanneauScience" Grid.Row="3" Wrap="Wrap" JustifyContent="SpaceBetween">
+                <Button x:Name="Science0" Text="2nde" Style="{StaticResource Sci}" FlexLayout.Basis="19%" BackgroundColor="#4B6584" Clicked="OnBasculeSeconde" />
+                <Button x:Name="Science1" Text="sin(" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science2" Text="cos(" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science3" Text="tan(" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science4" Text="π" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science5" Text="ln(" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science6" Text="log(" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science7" Text="√" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science8" Text="x²" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science9" Text="xʸ" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science10" Text="(" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science11" Text="x!" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science12" Text="1/x" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science13" Text="x³" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+                <Button x:Name="Science14" Text=")" Style="{StaticResource Sci}" FlexLayout.Basis="19%" Clicked="OnTouche" />
+            </FlexLayout>
 
-                    <VerticalStackLayout Spacing="2">
-                        <ScrollView Orientation="Horizontal"
-                                    HorizontalScrollBarVisibility="Never"
-                                    VerticalScrollBarVisibility="Never">
-                            <Label x:Name="LblExpression"
-                                   Text="0"
-                                   FontSize="15"
-                                   TextColor="#8E8E93"
-                                   HorizontalOptions="End"
-                                   LineBreakMode="NoWrap" />
-                        </ScrollView>
-                        <Label x:Name="LblResultat"
-                               Text="0"
-                               FontSize="44"
-                               FontAttributes="Bold"
-                               TextColor="#FFFFFF"
-                               HorizontalTextAlignment="End"
-                               VerticalTextAlignment="End"
-                               LineBreakMode="HeadTruncation"
-                               FontAutoScalingEnabled="True" />
-                    </VerticalStackLayout>
-                </Border>
+            <!-- Clavier numérique + opérations de base -->
+            <Grid Grid.Row="4" RowSpacing="4" ColumnSpacing="4" RowDefinitions="*,*,*,*,*" ColumnDefinitions="*,*,*,*">
+                <Button Grid.Row="0" Grid.Column="0" Text="C" Style="{StaticResource Action}" Clicked="OnTouche" />
+                <Button Grid.Row="0" Grid.Column="1" Text="⌫" Style="{StaticResource Action}" Clicked="OnTouche" />
+                <Button Grid.Row="0" Grid.Column="2" Text="%" Style="{StaticResource Action}" Clicked="OnTouche" />
+                <Button Grid.Row="0" Grid.Column="3" Text="÷" Style="{StaticResource Op}" Clicked="OnTouche" />
 
-                <!-- Rangée mémoire (HorizontalStackLayout) -->
-                <HorizontalStackLayout Grid.Row="2" Spacing="6">
-                    <Label x:Name="LblMemoire"
-                           Text="M"
-                           TextColor="#FF9F0A"
-                           FontAttributes="Bold"
-                           FontSize="16"
-                           IsVisible="False"
-                           VerticalOptions="Center"
-                           WidthRequest="22"
-                           HorizontalTextAlignment="Center" />
-                    <Button Text="MC" Style="{StaticResource ToucheMemoire}" Clicked="OnTouche" />
-                    <Button Text="MR" Style="{StaticResource ToucheMemoire}" Clicked="OnTouche" />
-                    <Button Text="M+" Style="{StaticResource ToucheMemoire}" Clicked="OnTouche" />
-                    <Button Text="M−" Style="{StaticResource ToucheMemoire}" Clicked="OnTouche" />
-                    <Button Text="MS" Style="{StaticResource ToucheMemoire}" Clicked="OnTouche" />
-                </HorizontalStackLayout>
+                <Button Grid.Row="1" Grid.Column="0" Text="7" Clicked="OnTouche" />
+                <Button Grid.Row="1" Grid.Column="1" Text="8" Clicked="OnTouche" />
+                <Button Grid.Row="1" Grid.Column="2" Text="9" Clicked="OnTouche" />
+                <Button Grid.Row="1" Grid.Column="3" Text="×" Style="{StaticResource Op}" Clicked="OnTouche" />
 
-                <!-- Clavier scientifique (FlexLayout) -->
-                <FlexLayout x:Name="PanneauScience"
-                            Grid.Row="3"
-                            Wrap="Wrap"
-                            JustifyContent="SpaceEvenly"
-                            AlignItems="Stretch"
-                            Direction="Row">
-                    <Button x:Name="Science0" Text="2nde" Style="{StaticResource ToucheSeconde}" FlexLayout.Basis="20%" Clicked="OnBasculeSeconde" />
-                    <Button x:Name="Science1" Text="sin(" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science2" Text="cos(" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science3" Text="tan(" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science4" Text="π" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science5" Text="ln(" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science6" Text="log(" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science7" Text="√" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science8" Text="x²" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science9" Text="xʸ" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science10" Text="(" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science11" Text="x!" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science12" Text="1/x" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science13" Text="x³" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                    <Button x:Name="Science14" Text=")" Style="{StaticResource ToucheScience}" FlexLayout.Basis="20%" Clicked="OnTouche" />
-                </FlexLayout>
+                <Button Grid.Row="2" Grid.Column="0" Text="4" Clicked="OnTouche" />
+                <Button Grid.Row="2" Grid.Column="1" Text="5" Clicked="OnTouche" />
+                <Button Grid.Row="2" Grid.Column="2" Text="6" Clicked="OnTouche" />
+                <Button Grid.Row="2" Grid.Column="3" Text="−" Style="{StaticResource Op}" Clicked="OnTouche" />
 
-                <!-- Pavé numérique (Grid) -->
-                <Grid Grid.Row="4"
-                      ColumnSpacing="6"
-                      RowSpacing="6">
+                <Button Grid.Row="3" Grid.Column="0" Text="1" Clicked="OnTouche" />
+                <Button Grid.Row="3" Grid.Column="1" Text="2" Clicked="OnTouche" />
+                <Button Grid.Row="3" Grid.Column="2" Text="3" Clicked="OnTouche" />
+                <Button Grid.Row="3" Grid.Column="3" Text="+" Style="{StaticResource Op}" Clicked="OnTouche" />
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Button Grid.Row="0" Grid.Column="0" Text="C" Style="{StaticResource ToucheEfficace}" Clicked="OnTouche" />
-                    <Button Grid.Row="0" Grid.Column="1" Text="⌫" Style="{StaticResource ToucheEfficace}" Clicked="OnTouche" />
-                    <Button Grid.Row="0" Grid.Column="2" Text="%" Style="{StaticResource ToucheEfficace}" Clicked="OnTouche" />
-                    <Button Grid.Row="0" Grid.Column="3" Text="÷" Style="{StaticResource ToucheOperateur}" Clicked="OnTouche" />
-
-                    <Button Grid.Row="1" Grid.Column="0" Text="7" Style="{StaticResource ToucheChiffre}" Clicked="OnTouche" />
-                    <Button Grid.Row="1" Grid.Column="1" Text="8" Style="{StaticResource ToucheChiffre}" Clicked="OnTouche" />
-                    <Button Grid.Row="1" Grid.Column="2" Text="9" Style="{StaticResource ToucheChiffre}" Clicked="OnTouche" />
-                    <Button Grid.Row="1" Grid.Column="3" Text="×" Style="{StaticResource ToucheOperateur}" Clicked="OnTouche" />
-
-                    <Button Grid.Row="2" Grid.Column="0" Text="4" Style="{StaticResource ToucheChiffre}" Clicked="OnTouche" />
-                    <Button Grid.Row="2" Grid.Column="1" Text="5" Style="{StaticResource ToucheChiffre}" Clicked="OnTouche" />
-                    <Button Grid.Row="2" Grid.Column="2" Text="6" Style="{StaticResource ToucheChiffre}" Clicked="OnTouche" />
-                    <Button Grid.Row="2" Grid.Column="3" Text="−" Style="{StaticResource ToucheOperateur}" Clicked="OnTouche" />
-
-                    <Button Grid.Row="3" Grid.Column="0" Text="1" Style="{StaticResource ToucheChiffre}" Clicked="OnTouche" />
-                    <Button Grid.Row="3" Grid.Column="1" Text="2" Style="{StaticResource ToucheChiffre}" Clicked="OnTouche" />
-                    <Button Grid.Row="3" Grid.Column="2" Text="3" Style="{StaticResource ToucheChiffre}" Clicked="OnTouche" />
-                    <Button Grid.Row="3" Grid.Column="3" Text="+" Style="{StaticResource ToucheOperateur}" Clicked="OnTouche" />
-
-                    <Button Grid.Row="4" Grid.Column="0" Text="±" Style="{StaticResource ToucheChiffre}" Clicked="OnTouche" />
-                    <Button Grid.Row="4" Grid.Column="1" Text="0" Style="{StaticResource ToucheChiffre}" Clicked="OnTouche" />
-                    <Button Grid.Row="4" Grid.Column="2" Text="," Style="{StaticResource ToucheChiffre}" Clicked="OnTouche" />
-                    <Button Grid.Row="4" Grid.Column="3" Text="=" Style="{StaticResource ToucheEgalite}" Clicked="OnTouche" />
-                </Grid>
-            </Grid.Children>
+                <Button Grid.Row="4" Grid.Column="0" Text="±" Clicked="OnTouche" />
+                <Button Grid.Row="4" Grid.Column="1" Text="0" Clicked="OnTouche" />
+                <Button Grid.Row="4" Grid.Column="2" Text="," Clicked="OnTouche" />
+                <Button Grid.Row="4" Grid.Column="3" Text="=" Style="{StaticResource Egal}" Clicked="OnTouche" />
+            </Grid>
         </Grid>
 
-        <!-- Fond de masquage de l'historique -->
-        <Button x:Name="FondHistorique"
-                AbsoluteLayout.LayoutBounds="0,0,1,1"
-                AbsoluteLayout.LayoutFlags="All"
-                BackgroundColor="#80000000"
-                IsVisible="False"
-                Clicked="OnBasculeHistorique" />
-
-        <!-- Carte d'historique flottante (AbsoluteLayout) -->
-        <Border x:Name="CarteHistorique"
-                AbsoluteLayout.LayoutBounds="0.70,0.05,0.28,0.90"
-                AbsoluteLayout.LayoutFlags="All"
-                BackgroundColor="#2C2C2E"
-                Stroke="#3A3A3C"
-                StrokeThickness="1"
-                StrokeShape="RoundRectangle 14"
-                IsVisible="False"
-                Padding="12">
-
-            <Grid RowSpacing="8">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Label Text="Historique"
-                           TextColor="#FFFFFF"
-                           FontAttributes="Bold"
-                           FontSize="16"
-                           VerticalTextAlignment="Center" />
-                    <Button Grid.Column="1"
-                            Text="✕"
-                            TextColor="#FFFFFF"
-                            BackgroundColor="#48484A"
-                            FontSize="16"
-                            CornerRadius="16"
-                            HeightRequest="34"
-                            WidthRequest="34"
-                            Padding="0"
-                            Clicked="OnBasculeHistorique" />
+        <Button x:Name="FondHistorique" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#80000000" IsVisible="False" Clicked="OnBasculeHistorique" />
+        
+        <Border x:Name="CarteHistorique" AbsoluteLayout.LayoutBounds="0.70,0.05,0.28,0.90" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#2C2C2E" Stroke="#3A3A3C" StrokeShape="RoundRectangle 14" IsVisible="False" Padding="10">
+            <Grid RowDefinitions="Auto,*" RowSpacing="8">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                    <Label Text="Historique" TextColor="#FFF" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                    <Button Grid.Column="1" Text="✕" Style="{StaticResource Action}" HeightRequest="30" WidthRequest="30" CornerRadius="15" Padding="0" Clicked="OnBasculeHistorique" />
                 </Grid>
-
-                <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Default">
-                    <VerticalStackLayout x:Name="ListeHistorique" Spacing="6" />
+                <ScrollView Grid.Row="1">
+                    <VerticalStackLayout x:Name="ListeHistorique" Spacing="4" />
                 </ScrollView>
             </Grid>
         </Border>
-
     </AbsoluteLayout>
-
 </ContentPage>
