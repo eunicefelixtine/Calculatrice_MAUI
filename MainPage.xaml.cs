@@ -77,7 +77,7 @@ public partial class MainPage : ContentPage
         }
 
         // Tailles de police : plus petites en paysage ou sur un petit écran.
-        _tailleResultat = paysage ? 32 : petitEcran ? 38 : 48;
+        _tailleResultat = paysage ? 32 : petitEcran ? 38 : _scienceVisible ? 42 : 48;
         LblExpression.FontSize = paysage || petitEcran ? 13 : 16;
 
         double policeTouches = paysage || petitEcran ? 19 : 24;
@@ -112,14 +112,17 @@ public partial class MainPage : ContentPage
             Panneau.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1.1, GridUnitType.Star)));
 
             Panneau.RowDefinitions.Add(new RowDefinition(GridLength.Auto));                         // 0 : outils
-            Panneau.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridUnitType.Star)));    // 1 : affichage
+            Panneau.RowDefinitions.Add(new RowDefinition(GridLength.Auto));                         // 1 : affichage
             Panneau.RowDefinitions.Add(new RowDefinition(GridLength.Auto));                         // 2 : mémoire
-            Panneau.RowDefinitions.Add(new RowDefinition(new GridLength(2.4, GridUnitType.Star)));  // 3 : science
+            Panneau.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridUnitType.Star)));    // 3 : science (défile)
 
+            // En paysage l'écran est peu haut : cadre d'affichage large et fixe pour que le résultat
+            // soit toujours visible, et le panneau scientifique défile dans l'espace restant.
+            Affichage.HeightRequest = 150;
             Placer(BarreOutils, 0, 0, 1);
             Placer(Affichage, 1, 0, 1);
             Placer(LigneMemoire, 2, 0, 1);
-            Placer(PanneauScience, 3, 0, 1);
+            Placer(DefileScience, 3, 0, 1);
             Placer(Clavier, 0, 1, 4);
 
             BtnSci.IsVisible = false;
@@ -135,10 +138,11 @@ public partial class MainPage : ContentPage
             Panneau.RowDefinitions.Add(new RowDefinition(new GridLength(0)));                       // 3 : science
             Panneau.RowDefinitions.Add(new RowDefinition(new GridLength(5, GridUnitType.Star)));    // 4 : clavier
 
+            Affichage.HeightRequest = -1;
             Placer(BarreOutils, 0, 0, 1);
             Placer(Affichage, 1, 0, 1);
             Placer(LigneMemoire, 2, 0, 1);
-            Placer(PanneauScience, 3, 0, 1);
+            Placer(DefileScience, 3, 0, 1);
             Placer(Clavier, 4, 0, 1);
 
             BtnSci.IsVisible = true;
@@ -158,14 +162,20 @@ public partial class MainPage : ContentPage
         bool paysage = _paysageApplique == true;
         bool visible = paysage || _scienceVisible;
 
-        PanneauScience.IsVisible = visible;
+        DefileScience.IsVisible = visible;
 
         if (!paysage)
         {
-            // On garde un espace d'affichage suffisant pour la valeur finale, même quand
-            // le panneau scientifique est visible. Sinon le résultat est comprimé et coupé.
-            Panneau.RowDefinitions[1].Height = new GridLength(1.8, GridUnitType.Star);
-            Panneau.RowDefinitions[3].Height = visible ? new GridLength(2.4, GridUnitType.Star) : new GridLength(0);
+            // En portrait, on réserve toujours assez d'espace pour le résultat principal.
+            // Le panneau scientifique ne doit ni faire disparaître l'affichage ni compresser
+            // le résultat final sous les boutons de fonctions.
+            double hauteurAffichage = visible ? 2.3 : 1.9;
+            double hauteurScience = visible ? 2.4 : 0d;
+            double hauteurClavier = visible ? 4.8 : 5;
+
+            Panneau.RowDefinitions[1].Height = new GridLength(hauteurAffichage, GridUnitType.Star);
+            Panneau.RowDefinitions[3].Height = new GridLength(hauteurScience, GridUnitType.Star);
+            Panneau.RowDefinitions[4].Height = new GridLength(hauteurClavier, GridUnitType.Star);
         }
     }
 
@@ -262,6 +272,7 @@ public partial class MainPage : ContentPage
 
         // Le bouton change de couleur quand le panneau est ouvert.
         BtnSci.TextColor = (Color)Resources[_scienceVisible ? "Accent" : "Texte"];
+        Rafraichir();
     }
 
     /// <summary>

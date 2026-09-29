@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="calculatrice_MAUI.MainPage"
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  Title="&lt;Eunice-calculator&gt;"
-             BackgroundColor="#1C1C1E">
+             BackgroundColor="git#1C1C1E">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -23,20 +23,25 @@
                 <Setter Property="Margin" Value="2" />
                 <Setter Property="MinimumHeightRequest" Value="0" />
                 <Setter Property="MinimumWidthRequest" Value="0" />
+                <Setter Property="BorderColor" Value="#4A4A4D" />
+                <Setter Property="BorderWidth" Value="1" />
             </Style>
 
             <Style x:Key="KOp" TargetType="Button" BasedOn="{StaticResource KBase}">
                 <Setter Property="BackgroundColor" Value="#FF9F0A" />
                 <Setter Property="TextColor" Value="#1C1C1E" />
+                <Setter Property="BorderColor" Value="#FFC070" />
             </Style>
 
             <Style x:Key="KEgal" TargetType="Button" BasedOn="{StaticResource KOp}">
                 <Setter Property="BackgroundColor" Value="#0A84FF" />
                 <Setter Property="TextColor" Value="#FFFFFF" />
+                <Setter Property="BorderColor" Value="#6BB4FF" />
             </Style>
 
             <Style x:Key="KAction" TargetType="Button" BasedOn="{StaticResource KBase}">
                 <Setter Property="BackgroundColor" Value="#48484A" />
+                <Setter Property="BorderColor" Value="#606064" />
             </Style>
 
             <Style x:Key="Memo" TargetType="Button">
@@ -47,6 +52,8 @@
                 <Setter Property="CornerRadius" Value="8" />
                 <Setter Property="Padding" Value="0" />
                 <Setter Property="Margin" Value="2" />
+                <Setter Property="BorderColor" Value="#4A4A4D" />
+                <Setter Property="BorderWidth" Value="1" />
             </Style>
 
             <Style x:Key="Chip" TargetType="Button" BasedOn="{StaticResource Memo}">
@@ -68,6 +75,9 @@
                 <Setter Property="Margin" Value="2" />
                 <Setter Property="MinimumHeightRequest" Value="0" />
                 <Setter Property="MinimumWidthRequest" Value="0" />
+                <Setter Property="BorderColor" Value="#3A3A3C" />
+                <Setter Property="BorderWidth" Value="1" />
+                <Setter Property="HeightRequest" Value="46" />
             </Style>
 
         </ResourceDictionary>
@@ -102,7 +112,7 @@
 
             <Border x:Name="Affichage" Grid.Row="1"
                     Margin="0,0,0,7"
-                    MinimumHeightRequest="72"
+                    MinimumHeightRequest="90"
                     BackgroundColor="#2C2C2E"
                     Stroke="#3A3A3C"
                     StrokeThickness="1"
@@ -147,14 +157,15 @@
                 <Button Grid.Column="5" Text="MS" Style="{StaticResource Memo}" Clicked="OnTouche" />
             </Grid>
 
-            <!-- Touches scientifiques : Grid 3 lignes x 5 colonnes, avec les mêmes espacements
-                 que le clavier pour obtenir des touches de même hauteur. -->
-            <Grid x:Name="PanneauScience" Grid.Row="3" Margin="0,0,0,7" IsVisible="False"
-                  RowSpacing="7" ColumnSpacing="7">
+            <!-- Touches scientifiques : enroulées dans une ScrollView pour rester accessibles
+                 même quand l'écran manque de hauteur (paysage notamment). -->
+            <ScrollView x:Name="DefileScience" Grid.Row="3" Margin="0,0,0,7" IsVisible="False"
+                        VerticalScrollBarVisibility="Never">
+                <Grid x:Name="PanneauScience" RowSpacing="7" ColumnSpacing="7">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -182,6 +193,7 @@
                 <Button x:Name="Science13" Grid.Row="2" Grid.Column="3" Text="x³" Style="{StaticResource Sci}" Clicked="OnTouche" />
                 <Button x:Name="Science14" Grid.Row="2" Grid.Column="4" Text=")" Style="{StaticResource Sci}" Clicked="OnTouche" />
             </Grid>
+            </ScrollView>
 
             <Grid x:Name="Clavier" Grid.Row="4" RowSpacing="7" ColumnSpacing="7">
                 <Grid.RowDefinitions>
@@ -246,7 +258,7 @@
             <Grid RowDefinitions="Auto,*" RowSpacing="8">
                 <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto">
                     <Label Text="Historique" TextColor="#FFFFFF" FontAttributes="Bold" VerticalTextAlignment="Center" />
-                    <Button Grid.Column="1" Text="Vider" Style="{StaticResource KAction}" HeightRequest="30" Padding="10,0" Margin="0" Clicked="OnViderHistorique" />
+                    <Button Grid.Column="1" Style="{StaticResource KAction}" HeightRequest="30" WidthRequest="30" CornerRadius="15" Padding="0" Margin="0" ImageSource="trash.png" Clicked="OnViderHistorique" />
                     <Button Grid.Column="2" Text="✕" Style="{StaticResource KAction}" HeightRequest="30" WidthRequest="30" CornerRadius="15" Padding="0" Clicked="OnBasculeHistorique" />
                 </Grid>
                 <ScrollView Grid.Row="1">
