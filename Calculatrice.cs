@@ -2,16 +2,25 @@ using System.Globalization;
 
 namespace calculatrice_MAUI;
 
+/// <summary>
+/// Classe métier de la calculatrice.
+/// Elle contient l'état courant de l'expression, la gestion de la mémoire,
+/// l'historique et les opérations de calcul ainsi que l'évaluation des expressions.
+/// </summary>
 public sealed class Calculatrice
 {
     public enum ModeAngle { Degres, Radians }
 
+    // Caractères visuels utilisés dans l'interface pour les opérateurs.
     private const char Moins = '−';
     private const char Multiplier = '×';
     private const char Diviser = '÷';
+
+    // Limites de sécurité pour éviter un affichage ou un historique trop volumineux.
     private const int LongueurMax = 40;
     private const int HistoriqueMax = 20;
 
+    // État interne de la calculatrice.
     private string _texte = string.Empty;
     private bool _apresEgal;
     private bool _erreur;
@@ -21,23 +30,49 @@ public sealed class Calculatrice
     private ModeAngle _mode = ModeAngle.Degres;
     private readonly List<string> _historique = new();
 
+    /// <summary>
+    /// Unité d'angle active pour les opérations trigonométriques.
+    /// </summary>
     public ModeAngle Angle
     {
         get => _mode;
         set => _mode = value;
     }
 
+    /// <summary>
+    /// Contenu textuel de l'expression actuellement construite.
+    /// </summary>
     public string Texte => _texte;
 
+    /// <summary>
+    /// Indique si une valeur est actuellement stockée en mémoire.
+    /// </summary>
     public bool MemoireActive => _memoire.HasValue;
 
+    /// <summary>
+    /// Indique si la calculatrice est dans un état d'erreur.
+    /// </summary>
     public bool EstErreur => _erreur;
 
+    /// <summary>
+    /// Historique des opérations effectuées, limité à un nombre défini.
+    /// </summary>
     public IReadOnlyList<string> Historique => _historique;
 
+    /// <summary>
+    /// Vide complètement l'historique enregistré.
+    /// </summary>
+    public void ViderHistorique()
+    {
+        _historique.Clear();
+    }
+
+    /// <summary>
+    /// Texte affiché dans la zone d'expression de l'interface.
+    /// </summary>
     public string ExpressionAffichage =>
         _erreur ? string.Empty
-        : _apresEgal ? _derniereExpression + " ="
+        : _apresEgal ? string.Empty
         : _texte.Length == 0 ? "0"
         : _texte;
 
