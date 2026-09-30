@@ -113,17 +113,23 @@ public partial class MainPage : ContentPage
 
             Panneau.RowDefinitions.Add(new RowDefinition(GridLength.Auto));                         // 0 : outils
             Panneau.RowDefinitions.Add(new RowDefinition(GridLength.Auto));                         // 1 : affichage
-            Panneau.RowDefinitions.Add(new RowDefinition(GridLength.Auto));                         // 2 : mémoire
-            Panneau.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridUnitType.Star)));    // 3 : science (défile)
+            Panneau.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridUnitType.Star)));    // 2 : mémoire + science (défile)
 
-            // En paysage l'écran est peu haut : cadre d'affichage large et fixe pour que le résultat
-            // soit toujours visible, et le panneau scientifique défile dans l'espace restant.
-            Affichage.HeightRequest = 150;
+            // En paysage l'écran est peu haut : cadre d'affichage ramené à l'essentiel
+            // (opération + résultat toujours visibles et non coupés) pour libérer de la
+            // hauteur. La rangée mémoire rejoint les touches scientifiques dans la ScrollView :
+            // tout défile ensemble.
+            Affichage.HeightRequest = 84;
+            Affichage.MinimumHeightRequest = 0;
+            TailleTouchesScience(44, 6);
             Placer(BarreOutils, 0, 0, 1);
             Placer(Affichage, 1, 0, 1);
-            Placer(LigneMemoire, 2, 0, 1);
-            Placer(DefileScience, 3, 0, 1);
-            Placer(Clavier, 0, 1, 4);
+            Placer(DefileScience, 2, 0, 1);
+            Placer(Clavier, 0, 1, 3);
+
+            // La mémoire n'occupe plus sa rangée fixe : elle s'insère en haut du défilement.
+            Panneau.Remove(LigneMemoire);
+            PileScience.Insert(0, LigneMemoire);
 
             BtnSci.IsVisible = false;
             AbsoluteLayout.SetLayoutBounds(CarteHistorique, new Rect(1, 0.5, 0.5, 0.94));
@@ -139,13 +145,23 @@ public partial class MainPage : ContentPage
             Panneau.RowDefinitions.Add(new RowDefinition(new GridLength(5, GridUnitType.Star)));    // 4 : clavier
 
             Affichage.HeightRequest = -1;
+            Affichage.MinimumHeightRequest = 90;
             Placer(BarreOutils, 0, 0, 1);
             Placer(Affichage, 1, 0, 1);
             Placer(LigneMemoire, 2, 0, 1);
             Placer(DefileScience, 3, 0, 1);
             Placer(Clavier, 4, 0, 1);
 
+            // On remet la mémoire dans sa rangée fixe si elle avait rejoint le défilement.
+            if (PileScience.Children.Contains(LigneMemoire))
+            {
+                PileScience.Remove(LigneMemoire);
+                Panneau.Add(LigneMemoire);
+            }
+            Placer(LigneMemoire, 2, 0, 1);
+
             BtnSci.IsVisible = true;
+            TailleTouchesScience(46, 7);
             AbsoluteLayout.SetLayoutBounds(CarteHistorique, new Rect(0.5, 1, 0.94, 0.62));
         }
 
@@ -176,6 +192,19 @@ public partial class MainPage : ContentPage
             Panneau.RowDefinitions[1].Height = new GridLength(hauteurAffichage, GridUnitType.Star);
             Panneau.RowDefinitions[3].Height = new GridLength(hauteurScience, GridUnitType.Star);
             Panneau.RowDefinitions[4].Height = new GridLength(hauteurClavier, GridUnitType.Star);
+        }
+    }
+
+    /// <summary>
+    /// Ajuste la hauteur des touches scientifiques en fonction de l'espace disponible.
+    /// Sert à garantir qu'elles tiennent toutes sans défilement en mode paysage.
+    /// </summary>
+    private void TailleTouchesScience(double hauteur, double espacement)
+    {
+        PanneauScience.RowSpacing = espacement;
+        foreach (var enfant in PanneauScience.Children.OfType<Button>())
+        {
+            enfant.HeightRequest = hauteur;
         }
     }
 

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="calculatrice_MAUI.MainPage"
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  Title="&lt;Eunice-calculator&gt;"
-             BackgroundColor="git#1C1C1E">
+             BackgroundColor="#1C1C1E">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -157,10 +157,12 @@
                 <Button Grid.Column="5" Text="MS" Style="{StaticResource Memo}" Clicked="OnTouche" />
             </Grid>
 
-            <!-- Touches scientifiques : enroulées dans une ScrollView pour rester accessibles
-                 même quand l'écran manque de hauteur (paysage notamment). -->
+            <!-- Touches scientifiques + mémoire : enroulées dans une ScrollView pour rester
+                 accessibles ensemble même quand l'écran manque de hauteur (paysage). -->
             <ScrollView x:Name="DefileScience" Grid.Row="3" Margin="0,0,0,7" IsVisible="False"
-                        VerticalScrollBarVisibility="Never">
+                        Orientation="Vertical"
+                        VerticalScrollBarVisibility="Default">
+                <VerticalStackLayout x:Name="PileScience" Spacing="7">
                 <Grid x:Name="PanneauScience" RowSpacing="7" ColumnSpacing="7">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -192,7 +194,8 @@
                 <Button x:Name="Science12" Grid.Row="2" Grid.Column="2" Text="1/x" Style="{StaticResource Sci}" Clicked="OnTouche" />
                 <Button x:Name="Science13" Grid.Row="2" Grid.Column="3" Text="x³" Style="{StaticResource Sci}" Clicked="OnTouche" />
                 <Button x:Name="Science14" Grid.Row="2" Grid.Column="4" Text=")" Style="{StaticResource Sci}" Clicked="OnTouche" />
-            </Grid>
+                </Grid>
+                </VerticalStackLayout>
             </ScrollView>
 
             <Grid x:Name="Clavier" Grid.Row="4" RowSpacing="7" ColumnSpacing="7">
