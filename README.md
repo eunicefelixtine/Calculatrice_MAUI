@@ -1,57 +1,83 @@
 # Calculatrice .NET MAUI
 
-Calculatrice scientifique pour Android développée en **.NET MAUI** (C# / XAML).
+Application de calculatrice scientifique développée en .NET MAUI avec C# et XAML. Le projet vise un rendu moderne, responsive et adapté à Android, avec un moteur de calcul robuste et une interface qui évolue selon la taille de l'écran et l'orientation.
 
 ## Fonctionnalités
 
-- Opérations de base : `+`, `−`, `×`, `÷`, `^`
-- Priorités et parenthèses : `2 + 3 × 4 = 14`, `(2 + 3) × 4 = 20`
-- Fonctions scientifiques : `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `ln`, `log`, `log2`, `exp`, `abs`
-- Bascule d'angle **Deg / Rad**
-- Constantes `π` et `e`, racines `√` et `∛`, puissances `x²`, `x³`, `xʸ`, factorielle `x!`, inverse `1/x`
-- Pourcentage contextuel : `200 + 10 % = 220`, `50 % = 0,5`
-- Mémoire : `MC`, `MR`, `M+`, `M−`, `MS` avec indicateur `M`
-- **Ans** (reprend le dernier résultat), **historique** des 20 dernières opérations, **Copier** (presse-papiers)
-- Aperçu **en direct** du résultat pendant la saisie ; l'opération est affichée **au-dessus** du résultat
-- Division par zéro → `Impossible` (aucune plante, aucun débordement)
-- `0,1 + 0,2 = 0,3` : la virgule est gérée sans erreur d'arrondi perceptible
+- Opérations de base : +, −, ×, ÷
+- Priorités de calcul et parenthèses
+- Fonctions scientifiques : sin, cos, tan, asin, acos, atan, ln, log, log2, exp, abs
+- Bascule d'angle : Deg / Rad
+- Constantes : π et e
+- Racines et puissances : √, ∛, x², x³, xʸ
+- Factorielle, inverse, pourcentage contextuel
+- Mémoire : MC, MR, M+, M−, MS
+- Ans, historique des dernières opérations, copier dans le presse-papiers
+- Aperçu en direct du résultat et du calcul en cours
+- Gestion de la division par zéro avec message explicite : Impossible
+- Correction de précision pour des calculs comme 0,1 + 0,2 = 0,3
+- Interface adaptative en portrait et en paysage
 
-## Types de layout utilisés (7, dans une seule page)
+## Architecture du projet
 
-| Layout | Rôle |
-| --- | --- |
-| `AbsoluteLayout` | Racine de la page : positionne le panneau principal et la carte d'historique flottante |
-| `Grid` | Structure générale de la page et pavé numérique 4×5 |
-| `Border` | Cadre de la zone d'affichage et de la carte d'historique |
-| `VerticalStackLayout` | Empile l'opération au-dessus du résultat dans l'affichage |
-| `ScrollView` | Défilement horizontal de l'opération (jamais coupée) + liste d'historique |
-| `HorizontalStackLayout` | Rangées de puces (Deg/Ans/Hist/Copier) et boutons de mémoire (MC…MS) |
-| `FlexLayout` | Clavier scientifique 15 touches (enveloppement sur 3 rangées) |
+- `Calculatrice.cs` : moteur de calcul et analyse des expressions
+- `MainPage.xaml` : interface utilisateur en XAML
+- `MainPage.xaml.cs` : logique de l'interface, actions des boutons et comportement responsive
+- `MauiProgram.cs` : initialisation de l'application MAUI
+- `App.xaml`, `AppShell.xaml` : configuration de l'application
+- `calculatrice_MAUI.csproj` : configuration du projet MAUI et cibles de build
 
-L'interface s'adapte à l'orientation et aux petites tailles d'écran : le panneau
-scientifique est replié en mode paysage pour laisser le pavé numérique utilisable,
-et les polices sont réduites si l'écran est étroit.
+## Prérequis
+
+- .NET SDK 8
+- MAUI workload configuré pour Android
+- Android SDK installé et disponible
+- Un émulateur Android ou un appareil connecté
+- VS 2022 / VS Code avec les outils .NET MAUI
+
+## Démarrage
+
+Depuis la racine du projet :
+
+```bash
+dotnet restore
+dotnet build -f net8.0-android
+```
+
+Pour lancer l'application sur un appareil ou un émulateur :
+
+```bash
+dotnet run -f net8.0-android
+```
+
+Le projet est configuré pour cibler principalement Android :
+
+```xml
+<TargetFrameworks>net8.0-android</TargetFrameworks>
+```
+
+## Notes sur l'interface
+
+L'écran a été conçu pour rester lisible et ergonomique sur plusieurs tailles d'affichage :
+
+- affichage principal avec expression et résultat séparés
+- panneau scientifique repliable selon l'orientation
+- clavier optimisé pour les écrans petits
+- gestion dynamique de la police pour éviter les coupures de texte
+- historique flottant et navigation simplifiée par le design MAUI
 
 ## Moteur de calcul
 
-`Calculatrice.cs` implémente un **analyseur d'expression** (transformation de
-Shunting-Yard) : tokenisation, priorités des opérateurs, parenthèses
-auto-fermées, signes unaires, fonctions, postfixes (`²`, `³`, `!`). Le harnais de
-tests (`Program.cs` hors dépôt) couvre 77 scénarios.
+Le cœur de l'application repose sur un analyseur d'expression. Il transforme la saisie en tokens, applique les priorités des opérateurs, gère les parenthèses, les fonctions mathématiques et les opérations postfixes telles que x², x³ et x!.
 
-## Compilation
+## Exemple de calculs supportés
 
-```bash
-export TMPDIR="$HOME/.cache/dotnet-tmp"
-dotnet build -f net10.0-android
-```
+- `2 + 3 * 4 = 14`
+- `(2 + 3) * 4 = 20`
+- `sin(30)` selon le mode d'angle actif
+- `sqrt(9) = 3`
+- `10 % = 0,1` selon le contexte
 
-APK signé généré : `bin/Debug/net10.0-android/com.epi.calculatrice-Signed.apk`
-
-## Structure
-
-- `Calculatrice.cs` — moteur de calcul (expression)
-- `MainPage.xaml` + `MainPage.xaml.cs` — interface (7 layouts)
-- `MauiProgram.cs`, `App.xaml`, `AppShell.xaml` — amorçage de l'application
+## Auteur
 
 Projet réalisé par NZEUTEM DOMMOE Eunice Felixtine - 22GOO347
